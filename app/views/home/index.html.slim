@@ -1,1 +1,37 @@
+javascript:
+	var feelingBarWidth = 0;
+
+ 	function initFeelingPallete ( successCallback ){
+		var image = new Image();
+		image.onload = function(){
+			var context = document.getElementById('canvas').getContext('2d');
+			$("#canvas").width(1000);
+			$("#canvas").height(image.height);
+			context.width = $("#canvas").width();
+			context.drawImage(image, 0, 0);
+			feelingBarWidth = image.width;
+
+			successCallback(image);
+		}
+		image.src = "./assets/feelingbar.jpg";
+	}
+
+	function colorWithFeeling(feeling){
+		var context = $("#canvas")[0].getContext('2d');
+		return context.getImageData(feelingBarWidth * (1-feeling), 1, 1, 1).data;
+	}
+
+	function toRGBString(r,g,b){
+		return "rgb("+Math.round(r)+","+Math.round(g)+","+Math.round(b)+")";
+	}
+
+	$(function(){
+		initFeelingPallete(function(image){
+			var colorData = colorWithFeeling(0.5);
+			$("p").css("background-color",toRGBString(colorData[0],colorData[1],colorData[2]));
+		});
+	});
+
 h3 Home
+canvas[id="canvas" style="display:block;"]
+p[style="width:1000px;height:1000px"]
