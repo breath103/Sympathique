@@ -1,0 +1,23 @@
+development:
+  adapter:  postgresql
+  host:     localhost
+  encoding: unicode
+  database: sympathique_development
+  pool:     5
+  username: sympathique
+  password: 1994Kurt
+
+test:
+  adapter:  postgresql
+  host:     localhost
+  encoding: unicode
+  database: sympathique_test
+  pool:     5
+  username: sympathique
+  password: 1994Kurt
+  template: template0
+
+production:
+  adapter: postgresql
+  pool: 5
+  timeout: 5000

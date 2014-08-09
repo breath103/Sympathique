@@ -1,0 +1,129 @@
+
+<canvas id="canvas" style="width:100%;height:100%;"></canvas>
+<script type="text/paperscript" canvas="canvas">
+	NewColor = window.Color;
+	coord = function (x,y) {
+	  if(!x) var x=0;
+	  if(!y) var y=0;
+	  return {x: x, y: y};
+	}
+	function B1(t) { return t*t*t }
+	function B2(t) { return 3*t*t*(1-t) }
+	function B3(t) { return 3*t*(1-t)*(1-t) }
+	function B4(t) { return (1-t)*(1-t)*(1-t) }
+	function getBezier (percent,C1,C2,C3,C4) {
+	  var pos = new coord();
+	  pos.x = C1.x*B1(percent) + C2.x*B2(percent) + C3.x*B3(percent) + C4.x*B4(percent);
+	  pos.y = C1.y*B1(percent) + C2.y*B2(percent) + C3.y*B3(percent) + C4.y*B4(percent);
+	  return pos;
+	}
+	var c1 = coord(0, 0);
+	var c2 = coord(40, 40);
+	var c3 = coord(60, 50);
+	var c4 = coord(100, 0);
+	for(i = 0;i<100;i++) {
+		var pos = getBezier(i/100, c1,c2,c3,c4);
+	}
+	function getRandom(min, max) {
+  	return Math.random() * (max - min) + min;
+	}
+	function get1to1Random() {
+		return Math.random() * 2 - 1;
+	}
+	function getRandomSign() { 
+		if (get1to1Random() > 0)
+			return 1;
+		else
+			return -1;
+	}
+
+	function drawPetal(length, position, color) {
+		var maxWidth = length * 0.12;
+		var detailPointCount = 4;
+		var curvePath = function(direction, yOffset) {
+			var path = new Path({
+				fillColor: color,
+				strokeColor: "white",
+			  closed: false
+			});
+
+			path.selected = false;
+			path.add([0, 0]);
+			
+			var v1 = getRandom(0.25, 0.4);
+			var v2 = getRandom(0.3, 0.9);
+
+			var v3 = getRandom(0.6, 0.8);
+			var v4 = getRandom(0.3, 0.9);
+
+			if (v3 > 0.6 && v4 > 0.7)
+				v4 = getRandom(0.3, 0.5);
+
+			path.add([length * v1, direction * maxWidth * v2]);
+			path.add([length * v3, direction * maxWidth * v4 + yOffset]);
+			path.values = [v1,v2,v3,v4];
+
+			path.add([length, 0]);
+			path.translate(position);
+			path.smooth();
+			return path;
+		}
+		yOffset = get1to1Random() * maxWidth * 0.3;
+
+		var group = new Group([curvePath(1, yOffset), curvePath(-1, yOffset)]);
+		group.on('click', function() {
+			drawData = [];
+			this.getItems().forEach(function(path, i) {
+				path.fillColor = "green";
+				drawData[i] = path.values;
+			});
+			console.log(drawData);
+		});
+
+		return group;
+	}
+
+	function drawFlower(flowerWidth, petalsCount, colorGenerator) {
+		var flowerGroup = new Group();
+		var groups = [];
+		var startOffset = Math.random() * 360;
+		for (var i = 0; i<petalsCount; i++) {
+			var group = drawPetal(flowerWidth * getRandom(0.9, 1.05), [0, 0], colorGenerator().hexString());
+			group.rotate(startOffset + 360 / petalsCount * i + (360 / petalsCount * get1to1Random() * 0.1), [0, 0]);
+			groups.push(group);
+		}
+		groups.forEach(function(group){
+			flowerGroup.addChild(group);
+		});
+
+		var centerDot = new Path.Circle([0, 0], flowerWidth * getRandom(0.1, 0.12));
+		centerDot.fillColor = colorGenerator().rotate(getRandomSign() * 60).darken(0.7).hexString();
+		flowerGroup.addChild(centerDot);
+		return flowerGroup;
+	}
+
+	function darwRandomFlower(flowerSize) {
+		var baseColor = NewColor().hsl(Math.random() * 360, getRandom(40, 80), getRandom(30, 83));
+		var flowerGroup = drawFlower(flowerSize , 60, function(){
+			hsl = baseColor.hsl();
+			hsl.h += get1to1Random() * 10;
+			hsl.s += get1to1Random() * 10;
+			hsl.l += get1to1Random() * 10;
+			return NewColor(hsl);
+		});
+		flowerGroup.translate([flowerSize, flowerSize]);
+		return flowerGroup;
+	}
+	function onKeyDown(event) {
+		if (event.character == " ") { 
+			darwRandomFlower($("#canvas").width() / 2);
+		}
+	}
+	$(function(){
+		$("body").bind("touchend click", function(){
+			darwRandomFlower($("#canvas").width() / 2);
+			paper.view.draw();
+		});
+		$("body").trigger("touchend");
+	});
+</script>
