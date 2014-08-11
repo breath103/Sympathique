@@ -12,6 +12,7 @@
  *
  *= require_tree .
  *= require_self
+ *= require angular-carousel
  */
 
 
@@ -24,6 +25,16 @@ html, body {
 }
 
 .intro {
-	width: auto;
+	width: 100%;
 	height: 100%;
+	.rn-carousel-container, .rn-carousel-slides, .rn-carousel-slide {
+		width: 100%;
+		height: 100%;
+	}
+	.first-slide {
+		text-align: center;
+		line-height: 1.2;
+		font-weight: bold;
+		padding: 20%;
+	}
 }

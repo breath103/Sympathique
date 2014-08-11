@@ -13,4 +13,10 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap
-//= require_tree .
+
+//= require_tree ./lib
+
+//= require angular
+//= require angular-touch
+//= require angular-carousel
+//= require_tree ./angular

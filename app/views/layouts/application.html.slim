@@ -6,7 +6,9 @@ html
       = content_for?(:title) ? yield(:title) : 'Sympathique'
     meta name="description" content="#{content_for?(:description) ? yield(:description) : 'Sympathique'}"
     == stylesheet_link_tag "application", :media => 'all'
-    == javascript_include_tag 'application'
     == csrf_meta_tags
-  body
+  body ng-app="sympathique"
     == yield
+    == javascript_include_tag 'application'
+
+    
